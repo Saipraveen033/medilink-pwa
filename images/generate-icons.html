@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLink Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #0066cc;
+            text-align: center;
+        }
+        .canvas-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .button-group {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 3px;
+        }
+        .downloaded {
+            background: #c8e6c9;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏥 MediLink Icon Generator</h1>
+    <p style="text-align: center; color: #666;">Click on any icon below to download it as PNG</p>
+
+    <div class="canvas-container">
+        <div>
+            <h3>192x192 (Standard)</h3>
+            <canvas id="canvas192" width="192" height="192" style="width: 100%; max-width: 300px;"></canvas>
+            <button onclick="downloadIcon('canvas192', 'icon-192x192.png')">↓ Download 192x192</button>
+        </div>
+        
+        <div>
+            <h3>192x192 (Maskable)</h3>
+            <canvas id="canvas192mask" width="192" height="192" style="width: 100%; max-width: 300px;"></canvas>
+            <button onclick="downloadIcon('canvas192mask', 'icon-192x192-maskable.png')">↓ Download Maskable</button>
+        </div>
+        
+        <div>
+            <h3>512x512 (Standard)</h3>
+            <canvas id="canvas512" width="512" height="512" style="width: 100%; max-width: 300px;"></canvas>
+            <button onclick="downloadIcon('canvas512', 'icon-512x512.png')">↓ Download 512x512</button>
+        </div>
+        
+        <div>
+            <h3>512x512 (Maskable)</h3>
+            <canvas id="canvas512mask" width="512" height="512" style="width: 100%; max-width: 300px;"></canvas>
+            <button onclick="downloadIcon('canvas512mask', 'icon-512x512-maskable.png')">↓ Download Maskable</button>
+        </div>
+    </div>
+
+    <div>
+        <h3>72x72 (Badge)</h3>
+        <canvas id="canvas72" width="72" height="72" style="max-width: 150px;" ></canvas>
+        <button onclick="downloadIcon('canvas72', 'badge-72x72.png')">↓ Download Badge</button>
+    </div>
+
+    <div class="info">
+        <strong>✅ Instructions:</strong>
+        <ol>
+            <li>Click the download button for each icon</li>
+            <li>Save all PNG files to your <code>images/</code> folder</li>
+            <li>Open DevTools → Application → Service Workers to verify registration</li>
+            <li>Hard refresh (Ctrl+Shift+R) to clear old cache</li>
+            <li>Look for install button in browser address bar!</li>
+        </ol>
+    </div>
+
+    <div class="downloaded" id="downloaded">✅ Icon downloaded! Continue with the others...</div>
+
+    <script>
+        function drawIcon(canvasId, size, isMaskable = false) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Main blue background (with padding for maskable)
+            const padding = isMaskable ? size * 0.15 : 0;
+            ctx.fillStyle = '#0066cc';
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(size - padding, padding);
+            ctx.lineTo(size - padding, size - padding);
+            ctx.lineTo(padding, size - padding);
+            ctx.fill();
+            
+            // Draw rounded corners for main background
+            ctx.fillStyle = '#0066cc';
+            const radius = size * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(padding + radius, padding);
+            ctx.lineTo(size - padding - radius, padding);
+            ctx.quadraticCurveTo(size - padding, padding, size - padding, padding + radius);
+            ctx.lineTo(size - padding, size - padding - radius);
+            ctx.quadraticCurveTo(size - padding, size - padding, size - padding - radius, size - padding);
+            ctx.lineTo(padding + radius, size - padding);
+            ctx.quadraticCurveTo(padding, size - padding, padding, size - padding - radius);
+            ctx.lineTo(padding, padding + radius);
+            ctx.quadraticCurveTo(padding, padding, padding + radius, padding);
+            ctx.fill();
+            
+            // Draw medical cross (white)
+            ctx.fillStyle = '#ffffff';
+            const crossSize = size * 0.4;
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const barWidth = size * 0.15;
+            
+            // Horizontal bar
+            ctx.fillRect(centerX - crossSize / 2, centerY - barWidth / 2, crossSize, barWidth);
+            
+            // Vertical bar
+            ctx.fillRect(centerX - barWidth / 2, centerY - crossSize / 2, barWidth, crossSize);
+            
+            // Add heartbeat line for smaller icons
+            if (size <= 192) {
+                ctx.strokeStyle = '#00cc88';
+                ctx.lineWidth = size * 0.05;
+                ctx.beginPath();
+                const y = size * 0.75;
+                ctx.moveTo(size * 0.1, y);
+                ctx.lineTo(size * 0.3, y);
+                ctx.lineTo(size * 0.35, y - size * 0.1);
+                ctx.lineTo(size * 0.4, y + size * 0.05);
+                ctx.lineTo(size * 0.45, y - size * 0.08);
+                ctx.lineTo(size * 0.5, y);
+                ctx.lineTo(size * 0.9, y);
+                ctx.stroke();
+            }
+        }
+
+        function downloadIcon(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = filename;
+            link.click();
+            
+            // Show confirmation
+            const downloaded = document.getElementById('downloaded');
+            downloaded.style.display = 'block';
+            setTimeout(() => {
+                downloaded.style.display = 'none';
+            }, 3000);
+        }
+
+        // Draw all icons on load
+        window.addEventListener('load', () => {
+            drawIcon('canvas192', 192, false);
+            drawIcon('canvas192mask', 192, true);
+            drawIcon('canvas512', 512, false);
+            drawIcon('canvas512mask', 512, true);
+            drawIcon('canvas72', 72, false);
+        });
+    </script>
+</body>
+</html>
