@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0066cc">
+    <title>NFC System Tester - MediLink</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="MediLink">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MediLink">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #059669;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        h3 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #059669;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .status {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .status.show {
+            display: block;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+
+        .status.info {
+            background: #dbeafe;
+            color: #0c4a6e;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .quick-test {
+            display: grid;
+            gap: 10px;
+        }
+
+        .quick-test button {
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .info-box {
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #166534;
+            line-height: 1.6;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d97706;
+        }
+
+        .test-results {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            color: #374151;
+        }
+
+        .test-results .success {
+            color: #059669;
+        }
+
+        .test-results .error {
+            color: #dc2626;
+        }
+
+        .test-results .info {
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 NFC System Tester</h1>
+        <p class="subtitle">Test communication between NFC reader and MediLink server</p>
+
+        <!-- Section 1: Server Status -->
+        <div class="section">
+            <h3>Server Status</h3>
+            <div class="info-box">
+                ✅ Check if your Node.js server is running on <code>http://localhost:3000</code>
+            </div>
+            <button class="btn-primary" onclick="checkServerStatus()">Check Server Status</button>
+            <div id="statusResult" class="status"></div>
+        </div>
+
+        <!-- Section 2: Simulate NFC Scan -->
+        <div class="section">
+            <h3>Simulate NFC Scan</h3>
+            <p class="subtitle" style="margin-bottom: 15px;">Test the system without actual NFC hardware</p>
+            
+            <div class="input-group">
+                <input type="text" id="patientId" placeholder="Enter Patient ID (e.g., PATIENT12345)" value="PATIENT00001">
+                <button class="btn-primary" onclick="simulateNFCScan()">Simulate Scan</button>
+            </div>
+            <div id="scanResult" class="status"></div>
+        </div>
+
+        <!-- Section 3: Get Laptop IP -->
+        <div class="section">
+            <h3>Network Configuration</h3>
+            <div class="info-box">
+                Your laptop IP: <code>localhost</code> (When testing from same machine)<br>
+                For remote access from Android: Use your WiFi IP address (e.g., <code>192.168.1.100</code>)
+            </div>
+            <button class="btn-secondary" onclick="copyIP()">Copy to Clipboard</button>
+            <div id="ipResult" class="status"></div>
+        </div>
+
+        <!-- Section 4: Test Logs -->
+        <div class="section">
+            <h3>Test Logs</h3>
+            <div class="test-results" id="testLogs">
+                <div class="info">[INFO] Ready for testing...</div>
+            </div>
+            <button class="btn-secondary" onclick="clearLogs()" style="margin-top: 10px; width: 100%;">Clear Logs</button>
+        </div>
+
+        <!-- Section 5: Quick Tests -->
+        <div class="section">
+            <h3>Quick Tests</h3>
+            <div class="quick-test">
+                <button class="btn-primary" onclick="testAllEndpoints()">Run All Tests</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('testLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        function showStatus(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.className = `status show ${type}`;
+            el.textContent = message;
+        }
+
+        function clearLogs() {
+            document.getElementById('testLogs').innerHTML = '';
+            log('Logs cleared');
+        }
+
+        async function checkServerStatus() {
+            log('Checking server status...', 'info');
+            showStatus('statusResult', '⏳ Checking...', 'info');
+
+            try {
+                const response = await fetch('http://localhost:3000/status');
+                const data = await response.json();
+                
+                log('✅ Server is running', 'success');
+                showStatus('statusResult', '✅ Server is running on port 3000', 'success');
+                log(`Server response: ${JSON.stringify(data)}`, 'info');
+               
+            } catch (error) {
+                log('❌ Cannot reach server: ' + error.message, 'error');
+                showStatus('statusResult', 
+                    '❌ Cannot reach server. Make sure Node.js server is running: <code>node server.js</code>', 
+                    'error');
+            }
+        }
+
+        async function simulateNFCScan() {
+            const patientId = document.getElementById('patientId').value.trim();
+            
+            if (!patientId) {
+                showStatus('scanResult', '⚠️ Please enter a patient ID', 'error');
+                return;
+            }
+
+            log(`Simulating NFC scan for: ${patientId}`, 'info');
+            showStatus('scanResult', '⏳ Sending to server...', 'info');
+
+            try {
+                const response = await fetch(`http://localhost:3000/scan?data=${encodeURIComponent(patientId)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    log(`✅ NFC data sent successfully: ${patientId}`, 'success');
+                    log(`Server response: ${JSON.stringify(data)}`, 'info');
+                    showStatus('scanResult', 
+                        `✅ NFC scan successful! Check your browser - patient page should have opened.`, 
+                        'success');
+                } else {
+                    log(`❌ Server error: ${response.status}`, 'error');
+                    showStatus('scanResult', `❌ Server error: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                showStatus('scanResult', 
+                    `❌ Cannot connect to server: ${error.message}. Make sure 'node server.js' is running.`, 
+                    'error');
+            }
+        }
+
+        function copyIP() {
+            const ip = '192.168.1.100'; // Placeholder - they need to find their actual IP
+            navigator.clipboard.writeText(ip).then(() => {
+                showStatus('ipResult', '✅ IP address format copied! Update with your actual laptop IP.', 'success');
+                log('IP format copied to clipboard', 'info');
+            });
+        }
+
+        async function testAllEndpoints() {
+            log('Running all system tests...', 'info');
+            
+            // Test 1: Server Status
+            log('TEST 1: Checking server status...');
+            try {
+                const response = await fetch('http://localhost:3000/status');
+                if (response.ok) {
+                    log('✅ Server is accessible', 'success');
+                } else {
+                    log('❌ Server returned error: ' + response.status, 'error');
+                }
+            } catch (e) {
+                log('❌ Cannot reach server', 'error');
+                return;
+            }
+
+            // Test 2: Simulate NFC Scan
+            log('TEST 2: Simulating NFC scan...', 'info');
+            try {
+                const response = await fetch('http://localhost:3000/scan?data=TEST-PATIENT-001');
+                if (response.ok) {
+                    log('✅ NFC endpoint is working', 'success');
+                } else {
+                    log('❌ NFC endpoint error: ' + response.status, 'error');
+                }
+            } catch (e) {
+                log('❌ NFC endpoint unreachable', 'error');
+            }
+
+            log('All tests completed!', 'info');
+            showStatus('statusResult', '✅ All tests completed! Check logs for details.', 'success');
+        }
+
+        // Initial log
+        log('NFC System Tester initialized', 'info');
+        log('Open DevTools (F12) to see detailed logs', 'info');
+    </script>
+</body>
+</html>

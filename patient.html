@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0066cc">
+    <title>Patient Dashboard - MediLink</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="MediLink">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MediLink">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/pwa.js"></script>
+    <script src="js/auth.js"></script>
+</head>
+
+<body>
+    <div class="navbar items-center justify-between">
+        <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path
+                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                <path
+                    d="M12 5L9.04 7.96a2.17 2.17 0 000 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 013.79 0l2.96 2.66" />
+                <path d="M18 15l-2-2" />
+                <path d="M15 18l-2-2" />
+            </svg>
+            MediLink Patient
+        </div>
+        <div id="userNav"></div>
+    </div>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav style="display:flex;flex-direction:column;gap:.5rem">
+                <button class="sidebar-link active" onclick="switchTab('dashboard', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="9" />
+                        <rect x="14" y="3" width="7" height="5" />
+                        <rect x="14" y="12" width="7" height="9" />
+                        <rect x="3" y="16" width="7" height="5" />
+                    </svg>
+                    Dashboard
+                </button>
+                <button class="sidebar-link" onclick="switchTab('reports', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    Medical Reports
+                </button>
+                <button class="sidebar-link" onclick="switchTab('appointments', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                        <path d="M8 14h.01" />
+                        <path d="M12 14h.01" />
+                        <path d="M16 14h.01" />
+                        <path d="M8 18h.01" />
+                        <path d="M12 18h.01" />
+                        <path d="M16 18h.01" />
+                    </svg>
+                    Appointments
+                </button>
+                <button class="sidebar-link" onclick="switchTab('bills', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+                    </svg>
+                    Medical Bills
+                </button>
+                <button class="sidebar-link" onclick="switchTab('healthcard', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <line x1="2" y1="10" x2="22" y2="10" />
+                    </svg>
+                    Health Card / NFC
+                </button>
+                <button class="sidebar-link" onclick="switchTab('myprofile', this)">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                        <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    My Profile
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8" id="mainContent"
+            style="max-height:calc(100vh - 65px);overflow-y:auto;padding-bottom:5rem">
+            <div class="loading-screen" id="loadingScreen">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="contentArea" class="hidden">
+                <!-- Dashboard Tab -->
+                <div id="tab-dashboard" class="anim-fade hidden">
+                    <div class="card p-10 mb-8 relative overflow-hidden"
+                        style="background:linear-gradient(135deg, var(--emerald-700), var(--slate-900)); color:#fff; border:none; box-shadow:var(--shadow-lg);">
+                        <!-- Decor -->
+                        <div
+                            class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPC9zdmc+')] opacity-20 z-0">
+                        </div>
+                        <div
+                            class="absolute -top-32 -right-10 w-80 h-80 bg-emerald-400 rounded-full mix-blend-screen filter blur-3xl opacity-20 pointer-events-none">
+                        </div>
+
+                        <div class="relative z-10 flex items-center gap-8 flex-wrap">
+                            <div style="position:relative;cursor:pointer"
+                                onclick="document.getElementById('photoInput').click()" title="Change profile photo"
+                                class="anim-scale delay-100">
+                                <img id="patientPhoto" src="" class="avatar-xl" style="background:#fff;">
+                                <div style="position:absolute;bottom:0;right:0;background:var(--emerald-500);border-radius:50%;width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;border:3px solid var(--slate-900);box-shadow:var(--shadow-sm);transition:transform 0.2s;"
+                                    onmouseover="this.style.transform='scale(1.1)'"
+                                    onmouseout="this.style.transform='scale(1)'">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                                        stroke-width="2.5">
+                                        <path
+                                            d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                                        <circle cx="12" cy="13" r="4" />
+                                    </svg>
+                                </div>
+                                <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp"
+                                    style="display:none" onchange="handlePatientPhotoUpload(this)">
+                            </div>
+                            <div class="anim-slide-up delay-200">
+                                <h1 class="text-4xl font-black mb-1" id="patientName"
+                                    style="text-shadow:0 2px 4px rgba(0,0,0,0.3);">Loading...</h1>
+                                <p class="font-bold opacity-80 text-sm tracking-widest uppercase mb-4 text-emerald-200"
+                                    id="patientId">ID: Loading...</p>
+                                <div
+                                    class="flex gap-4 text-sm font-bold bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 inline-flex shadow-sm">
+                                    <span id="patientAge" class="text-white"></span>
+                                    <span class="opacity-50">|</span>
+                                    <span id="patientBg" class="text-emerald-300"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-3 gap-6 mb-8">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Reports</div>
+                            <div class="stat-value text-blue" id="statReports">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Appointments</div>
+                            <div class="stat-value text-amber" id="statAppts">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Current Status</div>
+                            <div class="stat-value text-emerald">Active</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2 gap-6">
+                        <div class="card p-6">
+                            <h3 class="font-black text-slate-900 mb-4 uppercase text-sm">Recent Reports</h3>
+                            <div id="recentReportsList" class="flex flex-col gap-3"></div>
+                        </div>
+                        <div class="card p-6">
+                            <h3 class="font-black text-slate-900 mb-4 uppercase text-sm">Next Appointment</h3>
+                            <div id="nextApptBox" class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                                <p class="text-slate-500 font-bold text-center">No upcoming appointments</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="tab-reports" class="anim-fade hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-black text-slate-900">Medical Reports</h2>
+                    </div>
+                    <div class="card overflow-x-auto">
+                        <table class="table" id="reportsTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Test type</th>
+                                    <th>Hospital</th>
+                                    <th>Doctor</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Medical Bills Tab -->
+                <div id="tab-bills" class="anim-fade hidden">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="text-2xl font-black text-slate-900">💳 Medical Bills</h2>
+                        <div class="flex gap-3">
+                            <button class="btn-filter active" onclick="filterBills('all')" style="padding:0.65rem 1.25rem;border:2px solid var(--emerald-600);background:var(--emerald-600);color:white;border-radius:1rem;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.3s ease">All</button>
+                            <button class="btn-filter" onclick="filterBills('unpaid')" style="padding:0.65rem 1.25rem;border:2px solid var(--slate-300);background:transparent;color:var(--slate-700);border-radius:1rem;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.3s ease">Unpaid</button>
+                            <button class="btn-filter" onclick="filterBills('paid')" style="padding:0.65rem 1.25rem;border:2px solid var(--slate-300);background:transparent;color:var(--slate-700);border-radius:1rem;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.3s ease">Paid</button>
+                        </div>
+                    </div>
+                    <div id="billsContainer" class="space-y-8"></div>
+                </div>
+
+                <!-- Appointments Tab -->
+                <div id="tab-appointments" class="anim-fade hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-black text-slate-900">Appointments</h2>
+                        <button class="btn btn-primary" onclick="showNewApptModal()">Book Appointment</button>
+                    </div>
+                    <div class="grid grid-2 gap-4" id="apptsGrid">
+                <!-- TEST: This should be replaced by JavaScript -->
+                <div class="card p-5" style="background: red; border: 3px solid blue;">
+                    <h3 style="color: white;">TEST CARD - If you see this, the file is updating!</h3>
+                    <p>Current time: <span id="testTime"></span></p>
+                </div>
+            </div>
+                </div>
+
+                <!-- Health Card Tab -->
+                <div id="tab-healthcard" class="anim-fade hidden">
+                    <div class="grid grid-2 gap-8 items-center" style="max-width:50rem;margin:0 auto">
+                        <!-- Digital Card -->
+                        <div class="health-card anim-scale">
+                            <div class="card-chip relative z-10"></div>
+                            <div class="flex justify-between items-center mb-6 relative z-10">
+                                <div class="font-black text-xs tracking-[0.2em] opacity-80 text-emerald-100">MEDILINK ID
+                                </div>
+                                <div id="cardQrCode"
+                                    style="background:#fff;padding:.4rem;border-radius:.5rem;box-shadow:0 4px 10px rgba(0,0,0,0.3)">
+                                </div>
+                            </div>
+                            <div class="relative z-10 mt-4">
+                                <h3 class="text-3xl font-black mb-1 letter-spacing-tight" id="cardName"
+                                    style="text-shadow:0 2px 4px rgba(0,0,0,0.5)">...</h3>
+                                <p class="font-bold opacity-70 text-sm tracking-widest uppercase mb-8 text-emerald-200"
+                                    id="cardId">...
+                                </p>
+                                <div class="flex justify-between border-t border-white"
+                                    style="border-color:rgba(255,255,255,.15);padding-top:1.25rem">
+                                    <div>
+                                        <div class="text-[0.65rem] font-bold opacity-60 uppercase tracking-widest mb-1">
+                                            Blood Group</div>
+                                        <div class="text-2xl font-black text-rose-300" id="cardBg"
+                                            style="text-shadow:0 2px 4px rgba(0,0,0,0.3)">...</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-[0.65rem] font-bold opacity-60 uppercase tracking-widest mb-1">
+                                            Joined</div>
+                                        <div class="text-xl font-black">24/25</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Actions -->
+                        <div class="flex flex-col gap-4">
+                            <h3 class="text-xl font-black text-slate-900">Manage NFC Card</h3>
+                            <p class="text-slate-500 mb-2">Write your profile link to an NFC-enabled health card or
+                                mobile device.</p>
+
+                            <button class="btn btn-emerald" onclick="writeToNFC()"
+                                style="padding:1rem;font-size:.8rem;background:var(--emerald-600);color:#fff"
+                                id="btnNfc">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M4.8 2.3A.3.3 0 105 2H4a2 2 0 00-2 2v5a6 6 0 006 6v0a6 6 0 006-6V4a2 2 0 00-2-2h-1a.2.2 0 10.3.3" />
+                                    <path d="M8 15v1a6 6 0 006 6v0a6 6 0 006-6v-4" />
+                                    <circle cx="20" cy="10" r="2" />
+                                </svg>
+                                Write to NFC Card
+                            </button>
+
+                            <button class="btn" onclick="downloadVirtualCard()"
+                                style="padding:1rem;font-size:.8rem;background:var(--blue-600);color:#fff">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                                Download Card Sticker
+                            </button>
+
+                            <p id="nfcStatus" class="text-sm font-bold text-slate-500 hidden mt-2"></p>
+
+                            <div class="mt-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 text-sm">
+                                <strong class="text-emerald">How it works:</strong> Tapping the NFC card will open your
+                                secure public profile page, allowing doctors to quickly link you to their dashboard.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Profile Tab -->
+                <div id="tab-myprofile" class="anim-fade hidden">
+                    <h2 class="text-2xl font-black text-slate-900 mb-6">My Profile</h2>
+                    <div class="grid grid-2 gap-8" style="max-width:50rem">
+                        <div class="card p-6">
+                            <h3 class="font-black text-slate-900 mb-4 uppercase text-sm">Personal Information</h3>
+                            <div style="display:flex;flex-direction:column;gap:1rem">
+                                <div>
+                                    <label class="label">Full Name</label>
+                                    <input type="text" id="profName" class="input" placeholder="Your full name">
+                                </div>
+                                <div>
+                                    <label class="label">Age</label>
+                                    <input type="number" id="profAge" class="input" placeholder="e.g. 25" min="1"
+                                        max="150">
+                                </div>
+                                <div>
+                                    <label class="label">Blood Group</label>
+                                    <select id="profBlood" class="input">
+                                        <option value="">Select</option>
+                                        <option>A+</option>
+                                        <option>A-</option>
+                                        <option>B+</option>
+                                        <option>B-</option>
+                                        <option>AB+</option>
+                                        <option>AB-</option>
+                                        <option>O+</option>
+                                        <option>O-</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="label">Phone</label>
+                                    <input type="tel" id="profPhone" class="input" placeholder="e.g. 91-9876543210">
+                                </div>
+                                <div>
+                                    <label class="label">Email</label>
+                                    <input type="email" id="profEmail" class="input" readonly style="opacity:.6">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card p-6">
+                            <h3 class="font-black text-slate-900 mb-4 uppercase text-sm">Health Details</h3>
+                            <div style="display:flex;flex-direction:column;gap:1rem">
+                                <div>
+                                    <label class="label">Allergies <span style="font-weight:400;opacity:.6">(comma
+                                            separated)</span></label>
+                                    <input type="text" id="profAllergies" class="input"
+                                        placeholder="e.g. Penicillin, Peanuts">
+                                </div>
+                                <div>
+                                    <label class="label">Chronic Conditions <span
+                                            style="font-weight:400;opacity:.6">(comma separated)</span></label>
+                                    <input type="text" id="profChronic" class="input"
+                                        placeholder="e.g. Diabetes, Asthma">
+                                </div>
+                                <div>
+                                    <label class="label">Emergency Contact</label>
+                                    <input type="text" id="profEmergency" class="input"
+                                        placeholder="e.g. Father - 91-9876543211">
+                                </div>
+                                <button onclick="saveProfile()" class="btn btn-primary mt-4" style="padding:.85rem"
+                                    id="saveProfileBtn">Save Profile</button>
+                                <p id="profileSaveMsg" class="text-sm font-bold text-emerald hidden"
+                                    style="text-align:center">Profile saved!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal-overlay hidden">
+        <div class="modal">
+            <h2 class="text-xl font-black mb-6">Book Appointment</h2>
+            <div class="flex flex-col gap-4 mb-6">
+                <div>
+                    <label class="label">Select Doctor</label>
+                    <div class="searchable-dropdown" style="position:relative">
+                        <input type="text" id="docSelect" class="input" placeholder="Search doctors by name, specialty, or hospital..." autocomplete="off">
+                        <div id="docSelectDropdown" class="dropdown-options" style="position:absolute;top:100%;left:0;right:0;background:white;border:1px solid var(--slate-200);border-radius:0.5rem;margin-top:0.25rem;max-height:200px;overflow-y:auto;z-index:50;display:none"></div>
+                    </div>
+                </div>
+                <div>
+                    <label class="label">Date</label>
+                    <input type="date" id="docDate" class="input">
+                </div>
+                <div>
+                    <label class="label">Available Slots</label>
+                    <select id="docTime" class="input"></select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button class="btn btn-outline"
+                    onclick="document.getElementById('bookingModal').classList.add('hidden')">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmBooking()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Nav -->
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-inner">
+            <button class="mobile-nav-btn active" onclick="switchTab('dashboard', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="9" />
+                    <rect x="14" y="3" width="7" height="5" />
+                    <rect x="14" y="12" width="7" height="9" />
+                    <rect x="3" y="16" width="7" height="5" />
+                </svg>
+                Home
+            </button>
+            <button class="mobile-nav-btn" onclick="switchTab('reports', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Reports
+            </button>
+            <button class="mobile-nav-btn" onclick="switchTab('appointments', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                Appts
+            </button>
+            <button class="mobile-nav-btn" onclick="switchTab('bills', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+                </svg>
+                Bills
+            </button>
+            <button class="mobile-nav-btn" onclick="switchTab('healthcard', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
+                </svg>
+                NFC
+            </button>
+            <button class="mobile-nav-btn" onclick="switchTab('myprofile', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                Profile
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .dropdown-option:hover {
+            background-color: var(--slate-50);
+        }
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+        
+        /* Medical Bills Animations */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(5, 150, 105, 0);
+            }
+        }
+
+        .bill-card {
+            animation: slideInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .bill-card:nth-child(1) { animation-delay: 0.1s; }
+        .bill-card:nth-child(2) { animation-delay: 0.2s; }
+        .bill-card:nth-child(3) { animation-delay: 0.3s; }
+        .bill-card:nth-child(4) { animation-delay: 0.4s; }
+        .bill-card:nth-child(5) { animation-delay: 0.5s; }
+
+        .bill-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bill-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .bill-item:hover::before {
+            left: 100%;
+        }
+
+        .bill-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(5, 150, 105, 0.15);
+        }
+
+        .bill-badge {
+            display: inline-block;
+            padding: 0.35rem 0.85rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+
+        .bill-badge-paid {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+            color: #0d7377;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .bill-badge-unpaid {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+            color: #92400e;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .bill-highlight {
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.08), rgba(13, 148, 136, 0.08));
+            border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+
+        .btn-filter {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-filter.active {
+            background: var(--emerald-600) !important;
+            color: white !important;
+            border-color: var(--emerald-600) !important;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+
+        .hospital-section {
+            animation: slideInLeft 0.5s ease forwards;
+        }
+
+        .bill-amount {
+            font-size: 1.75rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #059669, #0d9488);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+    <script>
+        // Test script to verify file updates
+        document.addEventListener('DOMContentLoaded', function() {
+            const testTime = document.getElementById('testTime');
+            if (testTime) {
+                testTime.textContent = new Date().toLocaleTimeString();
+            }
+            
+            // Clear test content after 2 seconds and show real appointments
+            setTimeout(() => {
+                const apptsGrid = document.getElementById('apptsGrid');
+                if (apptsGrid && apptsGrid.innerHTML.includes('TEST CARD')) {
+                    apptsGrid.innerHTML = '';
+                    console.log('Test content cleared - real appointments should load');
+                }
+            }, 2000);
+        });
+
+        let currentUser = null;
+        let currentPatient = null;
+        let reports = [];
+        let appointments = [];
+        let bills = [];
+        let billsFilter = 'all';
+        let doctorsList = [];
+
+        async function init() {
+            currentUser = await requireAuth(['patient']);
+            if (!currentUser) return;
+
+            renderUserNav(currentUser.profile, 'userNav');
+
+            // Fetch data
+            currentPatient = await findPatientByUserId(currentUser.user.id);
+            if (!currentPatient) {
+                // Auto-create a proper patient record in Supabase
+                currentPatient = await createPatientRecord(currentUser.user.id, currentUser.profile);
+                if (!currentPatient) {
+                    // Fallback if DB insert fails
+                    currentPatient = { id: 'ML-' + new Date().getFullYear() + '-000', name: currentUser.profile.full_name, age: '--', blood_group: '--', photo: 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser.profile.full_name) + '&background=059669&color=fff' };
+                }
+            }
+
+            reports = await fetchReports(currentPatient.id);
+            appointments = await fetchAppointments(currentPatient.id);
+            bills = await fetchBills(currentPatient.id);
+            doctorsList = await fetchDoctors();
+
+            renderDashboard();
+            renderReports();
+            renderAppointments();
+            renderBills();
+            renderHealthCard();
+            populateProfileForm();
+
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('contentArea').classList.remove('hidden');
+            switchTab('dashboard', document.querySelector('.sidebar-link'));
+
+            // Set min date for booking
+            document.getElementById('docDate').min = new Date().toISOString().split('T')[0];
+
+            // Auto-open booking if ?book=doctorId from QR scan
+            const bookDocId = new URLSearchParams(window.location.search).get('book');
+            if (bookDocId) {
+                showNewApptModal(bookDocId);
+                // Clean URL
+                window.history.replaceState({}, '', 'patient.html');
+            }
+
+            // Handle NFC scan from Android phone
+            const nfcData = new URLSearchParams(window.location.search).get('nfc');
+            if (nfcData) {
+                console.log('✅ NFC Scan received:', nfcData);
+                // Show NFC notification
+                showToast('📱 Patient loaded from NFC scan: ' + nfcData, 'success');
+                // Update the patient ID display to show it came from NFC
+                const patientIdElement = document.getElementById('patientId');
+                if (patientIdElement) {
+                    patientIdElement.innerHTML = 'ID: ' + currentPatient.id + ' <span style="font-size: 0.75em; margin-left: 8px; background: #3b82f6; color: white; padding: 2px 8px; border-radius: 4px;">NFC</span>';
+                }
+                // Clean URL
+                window.history.replaceState({}, '', 'patient.html');
+            }
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.mobile-nav-btn').forEach(l => l.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            ['dashboard', 'reports', 'appointments', 'bills', 'healthcard', 'myprofile'].forEach(id => {
+                const tabEl = document.getElementById('tab-' + id);
+                if (tabEl) tabEl.classList.add('hidden');
+            });
+            const activeTab = document.getElementById('tab-' + tabId);
+            if (activeTab) activeTab.classList.remove('hidden');
+        }
+
+        async function handlePatientPhotoUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            if (!currentPatient) return;
+            showToast('Uploading photo...', 'info');
+            const url = await uploadProfilePhoto(input.files[0], currentPatient.id, 'patients');
+            if (url) {
+                currentPatient.photo = url;
+                document.getElementById('patientPhoto').src = url;
+                showToast('Profile photo updated!', 'success');
+            } else {
+                showToast('Upload failed', 'error');
+            }
+            input.value = '';
+        }
+
+        function renderDashboard() {
+            document.getElementById('patientName').textContent = currentPatient.name;
+            document.getElementById('patientId').textContent = 'ID: ' + currentPatient.id;
+            document.getElementById('patientAge').textContent = currentPatient.age ? currentPatient.age + ' Years' : 'Age N/A';
+            document.getElementById('patientBg').textContent = currentPatient.blood_group || 'Blood Group N/A';
+            document.getElementById('patientPhoto').src = currentPatient.photo;
+
+            document.getElementById('statReports').textContent = reports.length;
+            document.getElementById('statAppts').textContent = appointments.length;
+
+            const recentList = document.getElementById('recentReportsList');
+            recentList.innerHTML = reports.slice(0, 3).map(r => `
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <div>
+                        <div class="font-bold text-sm text-slate-900">${r.type}</div>
+                        <div class="text-xs text-slate-500 font-bold">${r.date} • ${r.hospital}</div>
+                    </div>
+                    <span class="badge ${r.status === 'Normal' ? 'badge-green' : 'badge-amber'}">${r.status || 'Done'}</span>
+                </div>
+            `).join('') || '<div class="text-slate-500 text-sm font-bold">No reports yet</div>';
+
+            const upcoming = appointments.find(a => new Date(a.appointment_date) >= new Date(new Date().setHours(0, 0, 0, 0)));
+            const apptBox = document.getElementById('nextApptBox');
+            if (upcoming) {
+                apptBox.className = 'p-4 bg-emerald-50 rounded-2xl border border-emerald-100';
+                apptBox.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="font-black text-emerald">${upcoming.appointment_date}</div>
+                        <span class="badge badge-amber">${upcoming.appointment_time}</span>
+                    </div>
+                    <div class="font-bold text-slate-900">${upcoming.doctor_name || upcoming.doctor}</div>
+                    <div class="text-sm font-bold text-slate-500">${upcoming.hospital}</div>
+                `;
+            } else {
+                apptBox.className = 'p-4 bg-slate-50 rounded-2xl border border-slate-100';
+                apptBox.innerHTML = '<p class="text-slate-500 font-bold text-center">No upcoming appointments</p>';
+            }
+        }
+
+        function renderReports() {
+            document.getElementById('reportsBody').innerHTML = reports.map(r => `
+                <tr>
+                    <td class="font-bold text-sm text-slate-500">${r.date}</td>
+                    <td class="font-bold text-sm text-slate-900">${r.type}</td>
+                    <td class="text-sm">${r.hospital}</td>
+                    <td class="text-sm text-slate-500 font-bold">${r.doctor}</td>
+                    <td><span class="badge ${r.status === 'Normal' || r.status === 'Negative' ? 'badge-green' : 'badge-amber'}">${r.status || 'Done'}</span></td>
+                    <td>${r.file_url || r.fileUrl ? `<button onclick="window.open('${r.file_url || r.fileUrl}')" class="btn btn-outline btn-sm">View</button>` : '-'}</td>
+                </tr>
+            `).join('') || '<tr><td colspan="6" class="text-center font-bold text-slate-400">No reports found</td></tr>';
+        }
+
+        function renderAppointments() {
+            document.getElementById('apptsGrid').innerHTML = appointments.map(a => {
+                const isToday = new Date(a.appointment_date).toDateString() === new Date().toDateString();
+                return `
+                <div class="card p-6" style="min-width:0">
+                    <div class="flex justify-between items-start mb-4" style="gap:1rem">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="badge ${a.status === 'Confirmed' ? 'badge-green' : 'badge-amber'}">${a.status || 'Pending'}</span>
+                            ${isToday ? '<span class="badge badge-blue">Today</span>' : ''}
+                        </div>
+                        <div class="text-right" style="white-space:nowrap">
+                            <div class="font-black text-slate-900">${a.appointment_date}</div>
+                            <div class="text-xs font-bold text-slate-500 uppercase tracking-wide">${a.appointment_time}</div>
+                        </div>
+                    </div>
+                    <div class="font-bold text-slate-900" style="font-size:1rem;margin-bottom:.25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.doctor_name || a.doctor}</div>
+                    <div class="text-sm text-slate-500 font-bold" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.hospital || ''}</div>
+                </div>
+            `;
+        }).join('') || '<div class="col-span-2 card p-8 text-center text-slate-400 font-bold">No appointments found</div>';
+        }
+
+        function renderHealthCard() {
+            document.getElementById('cardName').textContent = currentPatient.name;
+            document.getElementById('cardId').textContent = currentPatient.id;
+            document.getElementById('cardBg').textContent = currentPatient.blood_group || '--';
+
+            // Generate QR code for NFC fallback
+            const qrUrl = window.location.origin + window.location.pathname.replace('patient.html', 'profile.html?id=' + currentPatient.id);
+            document.getElementById('cardQrCode').innerHTML = '';
+            new QRCode(document.getElementById('cardQrCode'), { text: qrUrl, width: 44, height: 44, colorDark: "#059669", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+        }
+
+        // ===== MEDICAL BILLS FUNCTIONS =====
+        async function fetchBills(patientId) {
+            const sb = getSupabase();
+            
+            // Sample bills data - organized by hospital
+            const sampleBillsData = [
+                {
+                    id: 1,
+                    patient_id: 'ML-2026-001',
+                    hospital: 'City Medical Center',
+                    date: '2026-03-15',
+                    amount: 15000,
+                    status: 'paid',
+                    description: 'Consultation & Lab Tests',
+                    billNumber: 'CMC-2026-0001'
+                },
+                {
+                    id: 2,
+                    patient_id: 'ML-2026-001',
+                    hospital: 'City Medical Center',
+                    date: '2026-02-10',
+                    amount: 8500,
+                    status: 'paid',
+                    description: 'Dental Checkup',
+                    billNumber: 'CMC-2026-0002'
+                },
+                {
+                    id: 3,
+                    patient_id: 'ML-2026-001',
+                    hospital: 'Apollo Hospital',
+                    date: '2026-03-25',
+                    amount: 25000,
+                    status: 'unpaid',
+                    description: 'Emergency Room Visit',
+                    billNumber: 'APO-2026-0001'
+                },
+                {
+                    id: 4,
+                    patient_id: 'ML-2026-001',
+                    hospital: 'Apollo Hospital',
+                    date: '2026-01-20',
+                    amount: 12000,
+                    status: 'paid',
+                    description: 'Surgery & Hospital Stay',
+                    billNumber: 'APO-2026-0002'
+                },
+                {
+                    id: 5,
+                    patient_id: 'ML-2026-001',
+                    hospital: 'Green Valley Clinic',
+                    date: '2026-03-30',
+                    amount: 5500,
+                    status: 'unpaid',
+                    description: 'Vaccination & Check-up',
+                    billNumber: 'GVC-2026-0001'
+                },
+                {
+                    id: 6,
+                    patient_id: 'ML-2026-002',
+                    hospital: 'Apollo Hospital',
+                    date: '2026-03-20',
+                    amount: 18000,
+                    status: 'paid',
+                    description: 'X-Ray & Consultation',
+                    billNumber: 'APO-2026-0003'
+                },
+                {
+                    id: 7,
+                    patient_id: 'ML-2026-002',
+                    hospital: 'City Medical Center',
+                    date: '2026-02-28',
+                    amount: 7500,
+                    status: 'paid',
+                    description: 'Blood Test & Pathology',
+                    billNumber: 'CMC-2026-0003'
+                },
+                {
+                    id: 8,
+                    patient_id: 'ML-2026-003',
+                    hospital: 'Green Valley Clinic',
+                    date: '2026-03-10',
+                    amount: 4000,
+                    status: 'paid',
+                    description: 'Regular Checkup',
+                    billNumber: 'GVC-2026-0002'
+                },
+                {
+                    id: 9,
+                    patient_id: 'ML-2026-003',
+                    hospital: 'Apollo Hospital',
+                    date: '2026-02-15',
+                    amount: 22000,
+                    status: 'unpaid',
+                    description: 'ICU Admission (3 days)',
+                    billNumber: 'APO-2026-0004'
+                }
+            ];
+
+            if (!sb) {
+                // Return filtered sample data for current patient
+                return sampleBillsData.filter(bill => bill.patient_id === patientId);
+            }
+
+            try {
+                const { data, error } = await sb
+                    .from('medical_bills')
+                    .select('*')
+                    .eq('patient_id', patientId)
+                    .order('date', { ascending: false });
+
+                if (error) {
+                    console.error('Error fetching bills:', error);
+                    return sampleBillsData.filter(bill => bill.patient_id === patientId);
+                }
+
+                return data || sampleBillsData.filter(bill => bill.patient_id === patientId);
+            } catch (error) {
+                console.error('Error fetching bills:', error);
+                return sampleBillsData.filter(bill => bill.patient_id === patientId);
+            }
+        }
+
+        function renderBills() {
+            const container = document.getElementById('billsContainer');
+            if (!bills || bills.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📄</div>
+                        <h3 class="text-xl font-black text-slate-900 mb-2">No Medical Bills</h3>
+                        <p class="text-slate-500">You don't have any medical bills yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group bills by hospital
+            const billsByHospital = {};
+            bills.forEach(bill => {
+                if (!billsByHospital[bill.hospital]) {
+                    billsByHospital[bill.hospital] = [];
+                }
+                billsByHospital[bill.hospital].push(bill);
+            });
+
+            // Render each hospital section
+            let html = '';
+            Object.keys(billsByHospital).forEach((hospital, index) => {
+                const hospitalBills = billsByHospital[hospital];
+                const totalAmount = hospitalBills.reduce((sum, b) => sum + (b.amount || 0), 0);
+                const paidAmount = hospitalBills.filter(b => b.status === 'paid').reduce((sum, b) => sum + (b.amount || 0), 0);
+                const unpaidAmount = hospitalBills.filter(b => b.status === 'unpaid').reduce((sum, b) => sum + (b.amount || 0), 0);
+
+                html += `
+                    <div class="hospital-section" style="animation-delay: ${index * 0.1}s">
+                        <div class="card p-6 mb-4 bill-highlight">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div style="width:2.5rem;height:2.5rem;border-radius:0.75rem;background:linear-gradient(135deg, #059669, #0d9488);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold">🏥</div>
+                                    <div>
+                                        <h3 class="text-lg font-black text-slate-900">${hospital}</h3>
+                                        <p class="text-sm text-slate-500">${hospitalBills.length} bill(s)</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm text-slate-500 font-bold">Total: </div>
+                                    <div class="bill-amount">₹${totalAmount.toLocaleString()}</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-3 gap-4 pt-4 border-t" style="border-color: rgba(5, 150, 105, 0.2)">
+                                <div>
+                                    <div class="text-xs text-slate-500 font-bold uppercase">Total</div>
+                                    <div class="text-sm font-black text-slate-900">₹${totalAmount.toLocaleString()}</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-500 font-bold uppercase">Paid</div>
+                                    <div class="text-sm font-black" style="color: #059669">₹${paidAmount.toLocaleString()}</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-slate-500 font-bold uppercase">Pending</div>
+                                    <div class="text-sm font-black" style="color: #f59e0b">₹${unpaidAmount.toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            ${hospitalBills.map((bill, idx) => `
+                                <div class="bill-card bill-item card p-5" style="animation-delay: ${(index * 0.1) + (idx * 0.05)}s; border-left: 4px solid ${bill.status === 'paid' ? '#10b981' : '#f59e0b'}">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-3 flex-1">
+                                            <div>
+                                                <h4 class="font-black text-slate-900">${bill.description}</h4>
+                                                <p class="text-xs text-slate-500 font-bold">${bill.billNumber}</p>
+                                            </div>
+                                        </div>
+                                        <span class="bill-badge bill-badge-${bill.status}">${bill.status === 'paid' ? '✓ Paid' : '⏳ Pending'}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between pt-3 border-t" style="border-color: rgba(15, 23, 42, 0.1)">
+                                        <div class="text-sm text-slate-500 font-bold">${new Date(bill.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+                                        <div class="text-lg font-black" style="color: ${bill.status === 'paid' ? '#059669' : '#f59e0b'};transition:all 0.3s">₹${bill.amount.toLocaleString()}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function filterBills(status) {
+            billsFilter = status;
+            
+            // Update button states
+            document.querySelectorAll('.btn-filter').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--slate-700)';
+                btn.style.borderColor = 'var(--slate-300)';
+            });
+            
+            event.target.classList.add('active');
+            event.target.style.background = 'var(--emerald-600)';
+            event.target.style.color = 'white';
+            event.target.style.borderColor = 'var(--emerald-600)';
+
+            // Filter and render
+            if (status === 'all') {
+                renderBills();
+            } else {
+                const filtered = bills.filter(b => b.status === status);
+                const container = document.getElementById('billsContainer');
+                
+                if (filtered.length === 0) {
+                    const billType = status === 'paid' ? 'paid' : 'unpaid';
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">✨</div>
+                            <h3 class="text-xl font-black text-slate-900 mb-2">No ${billType} Bills</h3>
+                            <p class="text-slate-500">You don't have any ${billType} medical bills.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Group filtered bills by hospital
+                const billsByHospital = {};
+                filtered.forEach(bill => {
+                    if (!billsByHospital[bill.hospital]) {
+                        billsByHospital[bill.hospital] = [];
+                    }
+                    billsByHospital[bill.hospital].push(bill);
+                });
+
+                // Render filtered bills
+                let html = '';
+                Object.keys(billsByHospital).forEach((hospital, index) => {
+                    const hospitalBills = billsByHospital[hospital];
+                    const totalAmount = hospitalBills.reduce((sum, b) => sum + (b.amount || 0), 0);
+
+                    html += `
+                        <div class="hospital-section" style="animation-delay: ${index * 0.1}s">
+                            <div class="card p-6 mb-4 bill-highlight">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div style="width:2.5rem;height:2.5rem;border-radius:0.75rem;background:linear-gradient(135deg, #059669, #0d9488);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold">🏥</div>
+                                        <div>
+                                            <h3 class="text-lg font-black text-slate-900">${hospital}</h3>
+                                            <p class="text-sm text-slate-500">${hospitalBills.length} bill(s)</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm text-slate-500 font-bold">Total: </div>
+                                        <div class="bill-amount">₹${totalAmount.toLocaleString()}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                ${hospitalBills.map((bill, idx) => `
+                                    <div class="bill-card bill-item card p-5" style="animation-delay: ${(index * 0.1) + (idx * 0.05)}s; border-left: 4px solid ${bill.status === 'paid' ? '#10b981' : '#f59e0b'}">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <div class="flex items-center gap-3 flex-1">
+                                                <div>
+                                                    <h4 class="font-black text-slate-900">${bill.description}</h4>
+                                                    <p class="text-xs text-slate-500 font-bold">${bill.billNumber}</p>
+                                                </div>
+                                            </div>
+                                            <span class="bill-badge bill-badge-${bill.status}">${bill.status === 'paid' ? '✓ Paid' : '⏳ Pending'}</span>
+                                        </div>
+                                        <div class="flex items-center justify-between pt-3 border-t" style="border-color: rgba(15, 23, 42, 0.1)">
+                                            <div class="text-sm text-slate-500 font-bold">${new Date(bill.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
+                                            <div class="text-lg font-black" style="color: ${bill.status === 'paid' ? '#059669' : '#f59e0b'};transition:all 0.3s">₹${bill.amount.toLocaleString()}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+        }
+
+        function formatSlotTime(t) {
+            if (!t) return t;
+            // If already has AM/PM, return as-is
+            if (/[AP]M/i.test(t)) return t;
+            const [h, m] = t.split(':');
+            const hr = parseInt(h, 10);
+            const ampm = hr >= 12 ? 'PM' : 'AM';
+            return ((hr % 12) || 12) + ':' + m + ' ' + ampm;
+        }
+
+        let selectedDoctor = null;
+
+        // Initialize searchable dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('docSelect');
+            const dropdown = document.getElementById('docSelectDropdown');
+            
+            if (searchInput && dropdown) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase();
+                    filterDoctors(query);
+                });
+                
+                searchInput.addEventListener('focus', function() {
+                    if (this.value) {
+                        filterDoctors(this.value.toLowerCase());
+                    } else {
+                        showAllDoctors();
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.searchable-dropdown')) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        function filterDoctors(query) {
+            const dropdown = document.getElementById('docSelectDropdown');
+            const filtered = doctorsList.filter(d => 
+                d.name.toLowerCase().includes(query) ||
+                (d.specialty && d.specialty.toLowerCase().includes(query)) ||
+                (d.hospital && d.hospital.toLowerCase().includes(query))
+            );
+            
+            dropdown.innerHTML = filtered.map(d => `
+                <div class="dropdown-option" style="padding:0.75rem;cursor:pointer;border-bottom:1px solid var(--slate-100);hover:bg-slate-50" 
+                     onclick="selectDoctor('${d.id}', '${d.name.replace(/'/g, "\\'")}', '${(d.specialty || '').replace(/'/g, "\\'")}', '${(d.hospital || '').replace(/'/g, "\\'")}')">
+                    <div class="font-bold text-sm text-slate-900">${d.name}</div>
+                    <div class="text-xs text-slate-500">${d.specialty || 'General'} • ${d.hospital || 'No Hospital'}</div>
+                </div>
+            `).join('');
+            
+            dropdown.style.display = filtered.length > 0 ? 'block' : 'none';
+        }
+
+        function showAllDoctors() {
+            filterDoctors('');
+        }
+
+        function selectDoctor(id, name, specialty, hospital) {
+            selectedDoctor = { id: parseInt(id) || id, name, specialty, hospital };
+            document.getElementById('docSelect').value = `${name} - ${specialty || 'General'} (${hospital || 'No Hospital'})`;
+            document.getElementById('docSelectDropdown').style.display = 'none';
+            updateDocSlots();
+        }
+
+        function showNewApptModal(preselectedDocId) {
+            document.getElementById('bookingModal').classList.remove('hidden');
+            
+            if (preselectedDocId) {
+                const doc = doctorsList.find(d => d.id == preselectedDocId);
+                if (doc) {
+                    selectDoctor(doc.id, doc.name, doc.specialty, doc.hospital);
+                }
+            }
+        }
+
+        function updateDocSlots() {
+            if (!selectedDoctor) return;
+            
+            const doc = doctorsList.find(d => String(d.id) === String(selectedDoctor.id));
+            document.getElementById('docTime').innerHTML = doc && doc.slots && doc.slots.length > 0
+                ? doc.slots.map(s => `<option value="${s}">${formatSlotTime(s)}</option>`).join('')
+                : '<option>No slots available</option>';
+        }
+
+        async function confirmBooking() {
+            if (!selectedDoctor) { showToast('Please select a doctor', 'error'); return; }
+            
+            const date = document.getElementById('docDate').value;
+            const time = document.getElementById('docTime').value;
+
+            if (!date || !time) { showToast('Select date and time', 'error'); return; }
+
+            const appt = {
+                patient_id: currentPatient.id, 
+                doctor_id: selectedDoctor.id,
+                doctor_name: selectedDoctor.name, 
+                specialization: selectedDoctor.specialty, 
+                hospital: selectedDoctor.hospital,
+                appointment_date: date, 
+                appointment_time: time, 
+                status: 'Pending'
+            };
+
+            const success = await saveAppointment(appt);
+            if (success) {
+                showToast('Appointment booked', 'success');
+                document.getElementById('bookingModal').classList.add('hidden');
+                selectedDoctor = null;
+                document.getElementById('docSelect').value = '';
+                appointments = await fetchAppointments(currentPatient.id);
+                renderAppointments();
+                renderDashboard();
+            } else {
+                showToast('Booking failed', 'error');
+            }
+        }
+
+        async function cancelAppt(id) {
+            if (!confirm('Cancel appointment?')) return;
+            if (await deleteAppointment(id)) {
+                showToast('Cancelled', 'success');
+                appointments = await fetchAppointments(currentPatient.id);
+                renderAppointments();
+                renderDashboard();
+            }
+        }
+
+        async function writeToNFC() {
+            const btn = document.getElementById('btnNfc');
+            const status = document.getElementById('nfcStatus');
+            status.classList.remove('hidden');
+
+            if (!('NDEFReader' in window)) {
+                status.className = 'text-sm font-bold text-rose-500 mt-2 block';
+                status.textContent = '❌ NFC not supported on this device/browser.';
+                return;
+            }
+
+            try {
+                btn.textContent = 'Ready... Tap Card'; btn.disabled = true;
+                status.className = 'text-sm font-bold text-blue-500 mt-2 block';
+                status.textContent = '⏳ Hold NFC card near device...';
+
+                const ndef = new NDEFReader();
+                await ndef.write({
+                    records: [{
+                        recordType: "url",
+                        data: window.location.origin + window.location.pathname.replace('patient.html', 'profile.html?id=' + currentPatient.id)
+                    }]
+                });
+
+                status.className = 'text-sm font-bold text-emerald-600 mt-2 block';
+                status.textContent = '✅ Profile link written to NFC card!';
+                btn.textContent = 'Write to NFC Card'; btn.disabled = false;
+            } catch (err) {
+                status.className = 'text-sm font-bold text-rose-500 mt-2 block';
+                status.textContent = '❌ Error: ' + err.message;
+                btn.textContent = 'Write to NFC Card'; btn.disabled = false;
+            }
+        }
+
+        // ===== DOWNLOAD VIRTUAL CARD =====
+        function downloadVirtualCard() {
+            const p = currentPatient;
+            if (!p) return;
+            const profileUrl = window.location.origin + window.location.pathname.replace('patient.html', 'profile.html?id=' + p.id);
+            generateCardImage(p, profileUrl, 'MediLink_Card_' + p.id + '.png');
+        }
+
+        function generateCardImage(p, qrUrl, filename) {
+            const W = 856, H = 540; // credit card ratio at 10x
+            const canvas = document.createElement('canvas');
+            canvas.width = W; canvas.height = H;
+            const ctx = canvas.getContext('2d');
+
+            // Background gradient
+            const grad = ctx.createLinearGradient(0, 0, W, H);
+            grad.addColorStop(0, '#059669'); grad.addColorStop(1, '#0d9488');
+            ctx.fillStyle = grad;
+            roundRect(ctx, 0, 0, W, H, 30, true);
+
+            // Subtle pattern
+            ctx.fillStyle = 'rgba(255,255,255,0.04)';
+            for (let i = 0; i < 6; i++) {
+                ctx.beginPath(); ctx.arc(W - 100 + i * 30, 100 + i * 40, 120 - i * 15, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // Top: MEDILINK ID label
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.font = 'bold 18px Inter, system-ui, sans-serif';
+            ctx.letterSpacing = '4px';
+            ctx.fillText('MEDILINK HEALTH CARD', 50, 55);
+
+            // Name
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 42px Inter, system-ui, sans-serif';
+            ctx.fillText(p.name || 'Patient', 50, 140);
+
+            // ID
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = 'bold 20px Inter, system-ui, sans-serif';
+            ctx.fillText('ID: ' + p.id, 50, 180);
+
+            // Divider
+            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(50, 220); ctx.lineTo(W - 250, 220); ctx.stroke();
+
+            // Info columns
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = 'bold 14px Inter, system-ui, sans-serif';
+            ctx.fillText('BLOOD GROUP', 50, 260);
+            ctx.fillText('AGE', 220, 260);
+            ctx.fillText('PHONE', 350, 260);
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 32px Inter, system-ui, sans-serif';
+            ctx.fillText(p.blood_group || '--', 50, 300);
+            ctx.font = 'bold 28px Inter, system-ui, sans-serif';
+            ctx.fillText(p.age ? p.age + ' yrs' : '--', 220, 300);
+            ctx.font = 'bold 20px Inter, system-ui, sans-serif';
+            ctx.fillText(p.phone || '--', 350, 300);
+
+            // Allergies
+            if (p.allergies && p.allergies.length > 0 && p.allergies[0]) {
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.font = 'bold 14px Inter, system-ui, sans-serif';
+                ctx.fillText('ALLERGIES', 50, 360);
+                ctx.fillStyle = '#fecaca';
+                ctx.font = 'bold 18px Inter, system-ui, sans-serif';
+                ctx.fillText(p.allergies.join(', '), 50, 390);
+            }
+
+            // Emergency contact
+            if (p.emergency_contact) {
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.font = 'bold 14px Inter, system-ui, sans-serif';
+                ctx.fillText('EMERGENCY CONTACT', 50, 440);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 18px Inter, system-ui, sans-serif';
+                ctx.fillText(p.emergency_contact, 50, 470);
+            }
+
+            // Bottom line
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '14px Inter, system-ui, sans-serif';
+            ctx.fillText('Scan QR to view full profile', 50, H - 30);
+
+            // QR code on the right
+            const qrSize = 200;
+            const qrX = W - qrSize - 50, qrY = (H - qrSize) / 2;
+            // White rounded background for QR
+            ctx.fillStyle = '#fff';
+            roundRect(ctx, qrX - 15, qrY - 15, qrSize + 30, qrSize + 30, 16, true);
+
+            // Render QR into a temp div, draw onto canvas
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position:absolute;left:-9999px;top:-9999px';
+            document.body.appendChild(tempDiv);
+            new QRCode(tempDiv, { text: qrUrl, width: qrSize, height: qrSize, colorDark: '#0f172a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+
+            // Wait for QR canvas to render
+            setTimeout(() => {
+                const qrCanvas = tempDiv.querySelector('canvas');
+                if (qrCanvas) ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+                tempDiv.remove();
+
+                // Download
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('Card downloaded!', 'success');
+            }, 300);
+        }
+
+        function roundRect(ctx, x, y, w, h, r, fill) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+        }
+
+        // ===== PROFILE FORM =====
+        function populateProfileForm() {
+            const p = currentPatient;
+            document.getElementById('profName').value = p.name || '';
+            document.getElementById('profAge').value = p.age || '';
+            document.getElementById('profBlood').value = p.blood_group || '';
+            document.getElementById('profPhone').value = p.phone || '';
+            document.getElementById('profEmail').value = p.email || currentUser.profile.email || '';
+            document.getElementById('profAllergies').value = (p.allergies || []).join(', ');
+            document.getElementById('profChronic').value = (p.chronic_conditions || []).join(', ');
+            document.getElementById('profEmergency').value = p.emergency_contact || '';
+        }
+
+        async function saveProfile() {
+            const btn = document.getElementById('saveProfileBtn');
+            btn.textContent = 'Saving...'; btn.disabled = true;
+
+            const name = document.getElementById('profName').value.trim();
+            const age = parseInt(document.getElementById('profAge').value) || null;
+            const blood_group = document.getElementById('profBlood').value;
+            const phone = document.getElementById('profPhone').value.trim();
+            const allergiesRaw = document.getElementById('profAllergies').value.trim();
+            const chronicRaw = document.getElementById('profChronic').value.trim();
+            const emergency_contact = document.getElementById('profEmergency').value.trim();
+
+            const allergies = allergiesRaw ? allergiesRaw.split(',').map(a => a.trim()).filter(Boolean) : [];
+            const chronic_conditions = chronicRaw ? chronicRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
+
+            if (!name) { showToast('Name is required', 'error'); btn.textContent = 'Save Profile'; btn.disabled = false; return; }
+
+            const sb = getSupabase();
+            if (sb) {
+                const { error } = await sb.from('patients').update({
+                    name, age, blood_group, phone, allergies, chronic_conditions, emergency_contact,
+                    updated_at: new Date().toISOString()
+                }).eq('id', currentPatient.id);
+
+                if (error) {
+                    showToast('Failed to save: ' + error.message, 'error');
+                    btn.textContent = 'Save Profile'; btn.disabled = false;
+                    return;
+                }
+            }
+
+            // Update local state
+            Object.assign(currentPatient, { name, age, blood_group, phone, allergies, chronic_conditions, emergency_contact });
+            renderDashboard();
+            renderHealthCard();
+
+            btn.textContent = 'Save Profile'; btn.disabled = false;
+            showToast('Profile saved!', 'success');
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

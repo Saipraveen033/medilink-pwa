@@ -1,0 +1,27 @@
+{
+  "name": "medilink-nfc-server",
+  "version": "1.0.0",
+  "description": "NFC Reader Server - Receives NFC data from Android phone and opens patient records",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "NFC",
+    "healthcare",
+    "medical-records",
+    "patient-management"
+  ],
+  "author": "MediLink",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "open": "^8.4.2"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

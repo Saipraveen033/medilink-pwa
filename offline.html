@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - MediLink</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .offline-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .status-message {
+            color: #666;
+            font-size: 16px;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .details {
+            background: #f5f5f5;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .details h3 {
+            color: #0066cc;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .details p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .cached-data {
+            margin: 20px 0;
+        }
+
+        .cached-data h3 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .cached-link-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .cached-link {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .cached-link:hover {
+            background: #0052a3;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            margin-right: 6px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49%, 100% {
+                opacity: 1;
+            }
+            50%, 99% {
+                opacity: 0.3;
+            }
+        }
+
+        .retry-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .retry-button:active {
+            transform: translateY(0);
+        }
+
+        .app-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+        }
+
+        .app-info p {
+            color: #0066cc;
+            font-size: 13px;
+            margin: 5px 0;
+        }
+
+        .logo {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="logo">🏥</div>
+        <h1>MediLink</h1>
+        
+        <div class="offline-icon">📡</div>
+        
+        <h2 style="font-size: 20px; color: #333; margin: 10px 0;">You're Offline</h2>
+        
+        <div class="status-message">
+            <span class="status-indicator"></span>
+            Check your internet connection
+        </div>
+
+        <div class="details">
+            <h3>What You Can Do</h3>
+            <p>✓ Access cached medical records</p>
+            <p>✓ View offline information</p>
+            <p>✓ Actions will sync when you're back online</p>
+        </div>
+
+        <div class="cached-data" id="cachedDataSection" style="display: none;">
+            <h3>Available Cached Pages</h3>
+            <div class="cached-link-group" id="cachedLinks"></div>
+        </div>
+
+        <button class="retry-button" onclick="location.reload()">Try Again</button>
+
+        <div class="app-info">
+            <p>💾 Your data is automatically saved when offline</p>
+            <p>🔐 All your medical information stays private</p>
+            <p>📱 MediLink works better online for full features</p>
+        </div>
+
+        <div class="footer">
+            <p>MediLink v1.0.0 • Healthcare Management System</p>
+            <p style="margin-top: 10px;">If problems persist, please restart your connection</p>
+        </div>
+    </div>
+
+    <script>
+        // Check for cached data
+        async function checkCachedPages() {
+            if (!('caches' in window)) return;
+            
+            const cacheNames = await caches.keys();
+            const cachedPages = [];
+
+            for (const cacheName of cacheNames) {
+                const cache = await caches.open(cacheName);
+                const requests = await cache.keys();
+                
+                for (const request of requests) {
+                    const url = new URL(request.url);
+                    if (url.pathname.endsWith('.html')) {
+                        cachedPages.push({
+                            name: url.pathname.split('/').pop(),
+                            path: url.pathname
+                        });
+                    }
+                }
+            }
+
+            if (cachedPages.length > 0) {
+                const section = document.getElementById('cachedDataSection');
+                const linksContainer = document.getElementById('cachedLinks');
+                
+                section.style.display = 'block';
+                
+                cachedPages.forEach(page => {
+                    const link = document.createElement('a');
+                    link.href = page.path;
+                    link.className = 'cached-link';
+                    link.textContent = page.name.replace('.html', '') || 'Home';
+                    linksContainer.appendChild(link);
+                });
+            }
+        }
+
+        // Check network status periodically
+        function checkConnection() {
+            if (navigator.onLine) {
+                // Try to reload
+                console.log('Connection restored, attempting to reload...');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        // Initialize
+        window.addEventListener('online', checkConnection);
+        checkCachedPages();
+
+        // Check connection every 3 seconds
+        setInterval(checkConnection, 3000);
+    </script>
+</body>
+</html>
